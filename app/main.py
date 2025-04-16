@@ -54,13 +54,13 @@ from langchain_community.docstore.in_memory import InMemoryDocstore
 ########################################################################################################################################################
 if not os.environ.get("NVIDIA_API_KEY", "").startswith("nvapi-"):
     #nvapi_key = getpass.getpass("Enter your NVIDIA API key: ")
-    nvapi_key="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"
+    nvapi_key=""
     assert nvapi_key.startswith("nvapi-"), f"{nvapi_key[:5]}... is not a valid key"
     os.environ["NVIDIA_API_KEY"] = nvapi_key
 
 # Set the OpenAI API key environment variable (comment out if not using OpenAI)
 if not os.getenv('OPENAI_API_KEY'):
-    openai_key = "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"
+    openai_key = ""
     os.environ["OPENAI_API_KEY"] = openai_key
 
 #####################################################################################################################################################
