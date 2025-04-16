@@ -1,0 +1,13 @@
+langchain-core 
+langchain-community 
+langchain-nvidia-ai-endpoints 
+fastapi 
+gradio 
+langserve 
+pyngrok 
+faiss-cpu 
+sse-starlette 
+nest-asyncio 
+uvicorn 
+pypdf 
+langchain-openai
