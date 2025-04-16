@@ -52,8 +52,7 @@ from langserve import add_routes
 from faiss import IndexFlatL2
 from langchain_community.docstore.in_memory import InMemoryDocstore
 ########################################################################################################################################################
-
-
+#print
 #####################################################################################################################################################
 # Create a custom retriever class
 class CustomRetriever(BaseRetriever):
