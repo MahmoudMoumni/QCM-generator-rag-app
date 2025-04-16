@@ -52,16 +52,7 @@ from langserve import add_routes
 from faiss import IndexFlatL2
 from langchain_community.docstore.in_memory import InMemoryDocstore
 ########################################################################################################################################################
-if not os.environ.get("NVIDIA_API_KEY", "").startswith("nvapi-"):
-    #nvapi_key = getpass.getpass("Enter your NVIDIA API key: ")
-    nvapi_key=""
-    assert nvapi_key.startswith("nvapi-"), f"{nvapi_key[:5]}... is not a valid key"
-    os.environ["NVIDIA_API_KEY"] = nvapi_key
 
-# Set the OpenAI API key environment variable (comment out if not using OpenAI)
-if not os.getenv('OPENAI_API_KEY'):
-    openai_key = ""
-    os.environ["OPENAI_API_KEY"] = openai_key
 
 #####################################################################################################################################################
 # Create a custom retriever class
