@@ -51,8 +51,13 @@ from langchain_nvidia_ai_endpoints import (
 from langserve import add_routes
 from faiss import IndexFlatL2
 from langchain_community.docstore.in_memory import InMemoryDocstore
+from dotenv import load_dotenv
+
+
+# Load from .env file
+
 ########################################################################################################################################################
-#print
+load_dotenv()
 #####################################################################################################################################################
 # Create a custom retriever class
 class CustomRetriever(BaseRetriever):
