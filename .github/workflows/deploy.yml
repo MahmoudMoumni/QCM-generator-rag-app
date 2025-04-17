@@ -41,10 +41,10 @@ jobs:
             EOT
 
             # Stop existing container (if running)
-            docker stop qcm-app || true
-            docker rm qcm-app || true
+            sudo docker stop qcm-app || true
+            sudo docker rm qcm-app || true
 
             # Build and run the updated container
-            docker build -t qcm-app .
-            docker run -d --env-file .env -p 80:8000 --name qcm-app qcm-app
+            sudo docker build -t qcm-app .
+            sudo docker run -d --env-file .env -p 80:8000 --name qcm-app qcm-app
           EOF
