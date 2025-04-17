@@ -44,7 +44,21 @@ jobs:
             sudo docker stop qcm-app || true
             sudo docker rm qcm-app || true
 
-            # Build and run the updated container
-            sudo docker build -t qcm-app .
-            sudo docker run -d --env-file .env -p 80:8000 --name qcm-app qcm-app
+            echo "Building Docker image..."
+            sudo docker build -t qcm-app . || { echo "Docker build failed"; exit 1; }
+
+            echo "Listing Docker images..."
+            sudo docker images || { echo "Failed to list Docker images"; exit 1; }
+
+            echo "Running the Docker container..."
+            sudo docker run -d --name qcm-app --env-file .env -p 80:8000 qcm-app || { echo "Docker run failed"; exit 1; }
+
+            echo "Checking Docker container status..."
+            sudo docker ps -a || { echo "Docker ps failed"; exit 1; }
+
+            echo "Getting Docker container logs..."
+            sudo docker logs qcm-app || { echo "Docker logs failed"; exit 1; }
+
+            echo "Deployment finished."
+
           EOF
