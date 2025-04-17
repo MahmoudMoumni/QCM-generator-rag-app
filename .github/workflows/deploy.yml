@@ -34,11 +34,11 @@ jobs:
             git pull origin main
 
             # Create .env file from GitHub secrets
-            cat <<EOT > .env
+            cat <<'EOT' > .env
             OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
             NVIDIA_API_KEY=${{ secrets.NVIDIA_API_KEY }}
             # Add more secrets as needed
-EOT
+            EOT
 
             # Stop existing container (if running)
             sudo docker stop qcm-app || true
