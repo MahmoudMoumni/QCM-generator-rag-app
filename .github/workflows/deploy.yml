@@ -35,10 +35,10 @@ jobs:
 
             # Create .env file from secrets
             cat <<EOT > .env
-OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-NVIDIA_API_KEY=${{ secrets.NVIDIA_API_KEY }}
-# Add more env vars here
-EOT
+            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+            NVIDIA_API_KEY=${{ secrets.NVIDIA_API_KEY }}
+            # Add more env vars here
+            EOT
 
             # Stop existing container if running
             docker stop qcm-app || true
