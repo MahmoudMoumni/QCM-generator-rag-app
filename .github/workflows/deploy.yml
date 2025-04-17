@@ -43,7 +43,7 @@ jobs:
             
             echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}">>.env
             echo "NVIDIA_API_KEY=${{ secrets.NVIDIA_API_KEY }}">>.env
-              # Add more secrets as needed
+          
 
             # Stop existing container (if running)
             sudo docker stop qcm-app || true
