@@ -1,0 +1,50 @@
+name: Deploy QCM Generator App to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-22.04
+
+    steps:
+      # Step 1: Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up SSH key
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+      # Step 3: Copy project to EC2
+      - name: Copy files to EC2
+        run: |
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+          rsync -avz --exclude='.git' ./ ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/qcm-generator-rag-app
+
+      # Step 4: SSH into EC2 and deploy
+      - name: SSH and deploy
+        run: |
+          ssh ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+            cd ~/qcm-generator-rag-app
+
+            # Create .env file from secrets
+            cat <<EOT > .env
+OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+NVIDIA_API_KEY=${{ secrets.NVIDIA_API_KEY }}
+# Add more env vars here
+EOT
+
+            # Stop existing container if running
+            docker stop qcm-app || true
+            docker rm qcm-app || true
+
+            # Rebuild and restart container
+            docker build -t qcm-generator-rag-app .
+            docker run --env-file .env -d --name qcm-app -p 80:8000 qcm-generator-rag-app
+          EOF

@@ -324,12 +324,5 @@ async def upload_file(file: UploadFile = File(...)):
 
 
 if __name__ == "__main__":
-    # Start ngrok tunnel
-    public_url = ngrok.connect(8000).public_url
-    print(f"Public URL {public_url}")
-
-    # Make asyncio work inside thread context (for Colab/Jupyter)
-    nest_asyncio.apply()
-
     # Run the FastAPI app
-    uvicorn.run(app, port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)

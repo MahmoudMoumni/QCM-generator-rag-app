@@ -11,3 +11,4 @@ nest-asyncio
 uvicorn 
 pypdf 
 langchain-openai
+python-dotenv
