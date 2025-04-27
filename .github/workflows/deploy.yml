@@ -37,13 +37,23 @@ jobs:
 
             touch .github/workflows/deploy.yml
 
-            touch .env
+            touch ./rag-app/.env
 
-            # Create .env file from GitHub secrets
+            # Create ./rag-app/.env file from GitHub secrets
             
-            echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}">>.env
-            echo "NVIDIA_API_KEY=${{ secrets.NVIDIA_API_KEY }}">>.env
-          
+            echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}">>./rag-app/.env
+            echo "NVIDIA_API_KEY=${{ secrets.NVIDIA_API_KEY }}">>./rag-app/.env
+            echo "FAISS_INDEX_PATH=${{ secrets.FAISS_INDEX_PATH }}">> ./rag-app/.env
+            echo "S3_AWS_ACCESS_KEY_ID=${{ secrets.S3_AWS_ACCESS_KEY_ID }}" >> ./rag-app/.env
+            echo "S3_AWS_SECRET_ACCESS_KEY=${{ secrets.S3_AWS_SECRET_ACCESS_KEY }}" >> ./rag-app/.env
+            echo "BUCKET_NAME=${{ secrets.BUCKET_NAME }}" >> ./rag-app/.env
+            echo "REGION=${{ secrets.REGION }}" >> ./rag-app/.env
+            echo "DB_HOST=${{ secrets.DB_HOST }}" >> ./rag-app/.env
+            echo "DB_PORT=${{ secrets.DB_PORT }}" >> ./rag-app/.env
+            echo "DB_NAME=${{ secrets.DB_NAME }}" >> ./rag-app/.env
+            echo "DB_USER=${{ secrets.DB_USER }}" >> ./rag-app/.env
+            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> ./rag-app/.env
+            echo "NGROK_AUTH_TOKEN=${{ secrets.NGROK_AUTH_TOKEN }}" >> ./rag-app/.env
 
             # Stop existing container (if running)
             sudo docker stop qcm-app || true
@@ -56,7 +66,7 @@ jobs:
             sudo docker images || { echo "Failed to list Docker images"; exit 1; }
 
             echo "Running the Docker container..."
-            sudo docker run -d --name qcm-app --env-file .env -p 80:8000 qcm-app || { echo "Docker run failed"; exit 1; }
+            sudo docker run -d --name qcm-app --env-file ./rag-app/.env -p 80:8000 qcm-app || { echo "Docker run failed"; exit 1; }
 
             echo "Checking Docker container status..."
             sudo docker ps -a || { echo "Docker ps failed"; exit 1; }

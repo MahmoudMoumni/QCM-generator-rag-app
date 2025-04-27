@@ -1,1 +1,1 @@
-ssh -i rag-app-key.pem ubuntu@13.51.159.93
+ssh -i rag-app-key.pem ubuntu@ip4

@@ -1,3 +1,4 @@
+numpy
 langchain-core 
 langchain-community 
 langchain-nvidia-ai-endpoints 
@@ -12,3 +13,5 @@ uvicorn
 pypdf 
 langchain-openai
 python-dotenv
+mysql-connector-python
+boto3
