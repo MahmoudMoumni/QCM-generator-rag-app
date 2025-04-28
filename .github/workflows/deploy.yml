@@ -68,6 +68,15 @@ jobs:
             
             echo "RAG_APP_URL=http://rag-app:8000">>./web-app/.env
 
+            #this env for the phpmyadmin secrets
+            touch .env
+            echo "PMA_HOST=${{ secrets.DB_HOST }}" >> .env
+            echo "PMA_PORT=${{ secrets.DB_PORT }}" >> .env
+            echo "PMA_USER=${{ secrets.DB_USER }}" >> .env
+            echo "PMA_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+            echo "APACHE_AUTH_USER=${{ secrets.APACHE_AUTH_USER }}" >> .env
+            echo "APACHE_AUTH_PASSWORD=${{ secrets.APACHE_AUTH_PASSWORD }}" >> .env
+
             # Stop and remove existing containers
             sudo docker-compose down || true
 
