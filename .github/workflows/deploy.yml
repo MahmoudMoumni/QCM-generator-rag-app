@@ -22,6 +22,9 @@ jobs:
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
       - name: SSH and deploy
+        env:  # << at the same level as run
+          GITHUB_USERNAME: ${{ secrets.GITHB_USERNAME }}
+          GITHUB_TOKEN: ${{ secrets.GITHB_TOKEN }}
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
 
@@ -33,7 +36,7 @@ jobs:
 
             # Go to app directory or clone if it doesn't exist
             if [ ! -d "qcm-generator-rag-app" ]; then
-              git clone https://github.com/${{ github.repository }}.git qcm-generator-rag-app
+              git clone https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git qcm-generator-rag-app
             fi
             cd qcm-generator-rag-app
 
