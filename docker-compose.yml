@@ -10,7 +10,7 @@ services:
     volumes:
       - ./faiss_db:/app/faiss_db   
     environment:
-      - ENVIRONMENT_MODE=development
+      - ENVIRONMENT_MODE=production
     env_file:
       - ./rag-app/.env
 
@@ -23,7 +23,7 @@ services:
     ports:
       - "80:5000" 
     environment:
-      - ENVIRONMENT_MODE=development
+      - ENVIRONMENT_MODE=production
     env_file:
       - ./web-app/.env
 
