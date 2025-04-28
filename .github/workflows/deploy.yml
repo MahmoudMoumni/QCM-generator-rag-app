@@ -28,7 +28,8 @@ jobs:
 
 
             sudo apt-get update
-            sudo apt-get install -y docker-compose-plugin
+            sudo apt install docker
+            sudo apt  install -y docker-compose 
 
             # Go to app directory or clone if it doesn't exist
             if [ ! -d "qcm-generator-rag-app" ]; then
