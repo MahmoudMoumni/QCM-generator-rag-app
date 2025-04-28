@@ -69,15 +69,15 @@ jobs:
             echo "RAG_APP_URL=http://rag-app:8000">>./web-app/.env
 
             # Stop and remove existing containers
-            sudo docker compose down || true
+            sudo docker-compose down || true
 
             # Rebuild and restart containers
-            sudo docker compose build
-            sudo docker compose up -d
+            sudo docker-compose build
+            sudo docker-compose up -d
 
             # Check status
-            sudo docker compose ps
-            sudo docker compose logs --tail=50            
+            sudo docker-compose ps
+            sudo docker-compose logs --tail=50            
 
 
             echo "Deployment finished."
