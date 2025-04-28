@@ -24,6 +24,12 @@ jobs:
       - name: SSH and deploy
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+
+
+
+            sudo apt-get update
+            sudo apt-get install -y docker-compose-plugin
+
             # Go to app directory or clone if it doesn't exist
             if [ ! -d "qcm-generator-rag-app" ]; then
               git clone https://github.com/${{ github.repository }}.git qcm-generator-rag-app
@@ -55,24 +61,23 @@ jobs:
             echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> ./rag-app/.env
             echo "NGROK_AUTH_TOKEN=${{ secrets.NGROK_AUTH_TOKEN }}" >> ./rag-app/.env
 
-            # Stop existing container (if running)
-            sudo docker stop qcm-app || true
-            sudo docker rm qcm-app || true
+            touch ./web-app/.env
 
-            echo "Building Docker image..."
-            sudo docker build -t qcm-app . || { echo "Docker build failed"; exit 1; }
+            # Create ./web-app/.env file from GitHub secrets
+            
+            echo "RAG_APP_URL=http://rag-app:8000">>./web-app/.env
 
-            echo "Listing Docker images..."
-            sudo docker images || { echo "Failed to list Docker images"; exit 1; }
+            # Stop and remove existing containers
+            sudo docker compose down || true
 
-            echo "Running the Docker container..."
-            sudo docker run -d --name qcm-app -v /home/ubuntu/qcm-generator-rag-app/faiss_db:/app/faiss_db --env-file ./rag-app/.env -p 80:8000 qcm-app || { echo "Docker run failed"; exit 1; }
+            # Rebuild and restart containers
+            sudo docker compose build
+            sudo docker compose up -d
 
-            echo "Checking Docker container status..."
-            sudo docker ps -a || { echo "Docker ps failed"; exit 1; }
+            # Check status
+            sudo docker compose ps
+            sudo docker compose logs --tail=50            
 
-            echo "Getting Docker container logs..."
-            sudo docker logs qcm-app || { echo "Docker logs failed"; exit 1; }
 
             echo "Deployment finished."
 

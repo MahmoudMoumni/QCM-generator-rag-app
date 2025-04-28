@@ -16,11 +16,11 @@ RUN apt-get update && apt-get install -y curl
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application files
-COPY rag-app/ ./rag-app/
+COPY . .
 
 
 # Expose port
 EXPOSE 8000
 
 # Run the app
-CMD ["python", "rag-app/main.py"]
+CMD ["python", "main.py"]

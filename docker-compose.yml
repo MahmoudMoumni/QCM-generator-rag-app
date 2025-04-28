@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  rag-app:
+    build:
+      context: ./rag-app
+    container_name: rag-app-container
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./faiss_db:/app/faiss_db   
+    environment:
+      - ENVIRONMENT_MODE=development
+    env_file:
+      - ./rag-app/.env
+
+    restart: always
+
+  web-app:
+    build:
+      context: ./web-app
+    container_name: web-app-container
+    ports:
+      - "80:5000" 
+    environment:
+      - ENVIRONMENT_MODE=development
+    env_file:
+      - ./web-app/.env
+
+    depends_on:
+      - rag-app
+    restart: always

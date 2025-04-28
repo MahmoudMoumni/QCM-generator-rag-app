@@ -72,7 +72,7 @@ import boto3
 ########################################################################################################################################################
 env_mode = os.getenv("ENVIRONMENT_MODE", "development")
 if env_mode == "development":
-    load_dotenv("../.env.development")
+    load_dotenv("./.env.development")
 
 #no need to load ../.env.production because in prod we are using docker and passing it --env-file our ..env.prod
     
@@ -187,7 +187,7 @@ def create_models():
   ## TODO: Make sure to pick your LLM and do your prompt engineering as necessary for the final assessment
   embedder = NVIDIAEmbeddings(model="nvidia/nv-embed-v1", truncate="END")
   instruct_llm = ChatNVIDIA(model="meta/llama3-8b-instruct")
-  rerank_llm= ChatOpenAI(temperature=0, model_name="gpt-4.1-nano", max_tokens=4000)
+  rerank_llm= ChatOpenAI(temperature=0, model_name="gpt-4.1-mini", max_tokens=4000)
   embed_dims = len(embedder.embed_query("test"))
   llm = instruct_llm
   return embedder, llm, instruct_llm, rerank_llm, embed_dims

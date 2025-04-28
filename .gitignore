@@ -1,3 +1,4 @@
-.env*
+rag-app/.env*
+web-app/.env*
 rag-app/uploaded_files/*
 rag-app/faiss_db/*
