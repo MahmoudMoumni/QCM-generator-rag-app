@@ -41,6 +41,7 @@ jobs:
             cd qcm-generator-rag-app
 
             # Pull latest changes
+            git remote set-url origin https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
             git pull origin main
 
             mkdir -p .github/workflows
