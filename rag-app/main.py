@@ -282,7 +282,7 @@ chat_prompt = ChatPromptTemplate.from_template(
   don't include in your response any additional text, you response must return
   the list of  multiple-choice questions only ! 
 
-  Generate very valid STRICT JSON. Ensure numbers are not surrounded by quotes.
+  Make sure to generate a correct json format. Ensure numbers are not surrounded by quotes.
   """
 )
 
