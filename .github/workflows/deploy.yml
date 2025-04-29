@@ -33,15 +33,15 @@ jobs:
             sudo apt install -y docker
             sudo apt  install -y docker-compose 
             echo "###############################################################################################"
-            echo https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/${GITHUB_USERNAME}/${GITHUB_REPO_NAME}.git
+            echo https://${{ secrets.GITHB_USERNAME }}:${{ secrets.GITHB_TOKEN }}@github.com/${{ secrets.GITHB_USERNAME }}/${{ secrets.REPO_NAME }}.git
             # Go to app directory or clone if it doesn't exist
             if [ ! -d "qcm-generator-rag-app" ]; then
-              git clone https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/${GITHUB_USERNAME}/${GITHUB_REPO_NAME}.git qcm-generator-rag-app
+              git clone https://${{ secrets.GITHB_USERNAME }}:${{ secrets.GITHB_TOKEN }}@github.com/${{ secrets.GITHB_USERNAME }}/${{ secrets.REPO_NAME }}.git qcm-generator-rag-app
             fi
             cd qcm-generator-rag-app
 
             # Pull latest changes
-            git remote set-url origin https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/${GITHUB_USERNAME}/${GITHUB_REPO_NAME}.git
+            git remote set-url origin https://${{ secrets.GITHB_USERNAME }}:${{ secrets.GITHB_TOKEN }}@github.com/${{ secrets.GITHB_USERNAME }}/${{ secrets.REPO_NAME }}.git
             git pull origin main
 
             mkdir -p .github/workflows
