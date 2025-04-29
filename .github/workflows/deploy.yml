@@ -33,6 +33,7 @@ jobs:
             sudo apt install -y docker
             sudo apt  install -y docker-compose 
 
+            echo https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/${GITHUB_USERNAME}/${GITHUB_REPO_NAME}.git
             # Go to app directory or clone if it doesn't exist
             if [ ! -d "qcm-generator-rag-app" ]; then
               git clone https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/${GITHUB_USERNAME}/${GITHUB_REPO_NAME}.git qcm-generator-rag-app
