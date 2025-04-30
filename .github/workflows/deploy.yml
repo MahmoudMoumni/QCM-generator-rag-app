@@ -76,7 +76,7 @@ jobs:
 
             # Create ./web-app/.env file from GitHub secrets
             
-            echo "RAG_APP_URL=http://rag-app:8000">>./web-app/.env
+            echo "RAG_APP_URL=${{ secrets.RAG_APP_URL }}" >>./web-app/.env
 
             #this env for the phpmyadmin secrets
             touch .env
