@@ -48,6 +48,12 @@ jobs:
 
             touch .github/workflows/deploy.yml
 
+            mkdir -p ./certbot
+            mkdir -p ./certbot/www
+            mkdir -p ./certbot/conf
+
+            #if its the first time we need to generate ssl certification
+
             touch ./rag-app/.env
 
             # Create ./rag-app/.env file from GitHub secrets
