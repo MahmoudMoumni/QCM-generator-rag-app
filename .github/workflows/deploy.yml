@@ -48,9 +48,7 @@ jobs:
 
             touch .github/workflows/deploy.yml
 
-            mkdir -p ./certbot
-            mkdir -p ./certbot/www
-            mkdir -p ./certbot/conf
+            sudo cp -r ../certbot ./certbot
 
             #if its the first time we need to generate ssl certification
 
