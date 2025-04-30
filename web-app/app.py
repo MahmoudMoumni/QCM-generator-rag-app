@@ -19,7 +19,7 @@ if env_mode == "development":
 RAG_APP_URL = os.getenv("RAG_APP_URL")
 
 
-# --- Mock: Generate fake questions (replace with real RAG later) ---
+# --- Mock: Generate fake questions 
 def generate_questions_from_pdf(file_path, num_questions):
     return [
         {
