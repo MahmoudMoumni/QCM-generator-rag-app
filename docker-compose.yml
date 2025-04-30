@@ -39,6 +39,8 @@ services:
       - APACHE_AUTH_TYPE=Basic
       - APACHE_AUTH_USER=${APACHE_AUTH_USER}
       - APACHE_AUTH_PASSWORD=${APACHE_AUTH_PASSWORD}
+      - PMA_ARBITRARY=1
+      - PMA_ABSOLUTE_URI=https://aicafe.click/phpmyadmin/
     ports:
       - "8080:80"
     restart: always
