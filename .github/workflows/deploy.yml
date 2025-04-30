@@ -84,6 +84,7 @@ jobs:
             echo "PMA_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
             echo "APACHE_AUTH_USER=${{ secrets.APACHE_AUTH_USER }}" >> .env
             echo "APACHE_AUTH_PASSWORD=${{ secrets.APACHE_AUTH_PASSWORD }}" >> .env
+            echo "PMA_ABSOLUTE_URI=${{ secrets.PMA_ABSOLUTE_URI }}" >> .env            
 
             # Stop and remove existing containers
             sudo docker-compose down || true
