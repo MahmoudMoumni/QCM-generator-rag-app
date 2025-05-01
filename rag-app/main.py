@@ -279,10 +279,10 @@ chat_prompt = ChatPromptTemplate.from_template(
 
   {format_instructions}
 
-  don't include in your response any additional text, you response must return
-  the list of  multiple-choice questions only ! 
+  Make sure to generate a correct json format. Ensure question id  is not surrounded by quotes like this ' " '.
 
-  Make sure to generate a correct json format. Ensure numbers are not surrounded by quotes.
+  Don't include in your response any additional text, you response must return the list of  multiple-choice questions only ! 
+
   """
 )
 
