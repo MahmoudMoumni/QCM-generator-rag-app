@@ -280,6 +280,7 @@ Requirements:
 -  {format_instructions}
 - Do **not** use quotes around `id`.
 - Do **not** add any extra text or explanation before or after the JSON.
+- Do not cut off or leave any question object incomplete.
 - Do **not** wrap the entire output in quotes or markdown.
 - You must return a valid JSON array only. Anything else will cause an error.
 
