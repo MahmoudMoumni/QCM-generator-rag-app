@@ -270,9 +270,8 @@ parser = PydanticOutputParser(pydantic_object=QuizOutput)
 format_instructions = parser.get_format_instructions()
 chat_prompt = ChatPromptTemplate.from_template(
   """
-  {instruction}
 
-  Generate {num_questions} multiple-choice questions from the following content.
+  Generate {num_questions} multiple-choice questions from the following content and make sure that {instruction}
 
   Content:
   {context}
@@ -281,7 +280,7 @@ chat_prompt = ChatPromptTemplate.from_template(
 
   Make sure to generate a correct json format. Ensure question id  is not surrounded by quotes like this ' " '.
 
-  Don't include in your response any additional text, you response must return the list of  multiple-choice questions only ! 
+  Don't include in your response any additional text such as "here is list ....", your response must ONLY RETURN the list of  multiple-choice questions  ! 
 
   """
 )
