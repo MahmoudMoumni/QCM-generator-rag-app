@@ -270,18 +270,21 @@ parser = PydanticOutputParser(pydantic_object=QuizOutput)
 format_instructions = parser.get_format_instructions()
 chat_prompt = ChatPromptTemplate.from_template(
   """
+You are an assistant that returns ONLY valid JSON arrays of objects. Do not include any explanation, markdown, or additional \
+text before or after the JSON. The JSON must be valid and parsable.
 
-  Generate {num_questions} multiple-choice questions from the following content and make sure that {instruction}
+Generate {num_questions} multiple-choice questions from the following content. 
 
-  Content:
-  {context}
+Requirements:
+- Output a **pure JSON list** of objects.
+-  {format_instructions}
+- Do **not** use quotes around `id`.
+- Do **not** add any extra text or explanation before or after the JSON.
+- Do **not** wrap the entire output in quotes or markdown.
+- You must return a valid JSON array only. Anything else will cause an error.
 
-  {format_instructions}
-
-  Make sure to generate a correct json format. Ensure question id  is not surrounded by quotes like this ' " '.
-
-  Don't include in your response any additional text such as '''Here is the list of  multiple-choice questions generated from the content: ''' your response must  RETURN ONLY the list of  multiple-choice questions !. 
-  DOn't surround the final response with any quotes because I will load your response as a json object ,DON'T FORGET THAT.
+Content:
+{context}
   """
 )
 
