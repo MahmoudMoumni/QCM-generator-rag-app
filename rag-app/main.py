@@ -546,6 +546,8 @@ async def get_documents():
 
 async def generate_quizzes(input_data):
   response = rag_chain.invoke(input_data)
+  print("response")
+  print(response)
   try:
     quizzes=json.loads(response)
   except Exception as e:
