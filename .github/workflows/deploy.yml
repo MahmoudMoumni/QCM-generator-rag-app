@@ -29,6 +29,10 @@ jobs:
 
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+            # Stop and remove existing containers ,ze do this in the beginning to avoid ram memory issues
+            sudo docker-compose down || true 
+
+
             sudo apt-get update
             sudo apt install -y docker
             sudo apt  install -y docker-compose 
@@ -69,7 +73,7 @@ jobs:
             echo "NGROK_AUTH_TOKEN=${{ secrets.NGROK_AUTH_TOKEN }}" >> ./backend/.env
             echo "UPLOAD_DIR =/app/uploaded_documents" >> ./backend/.env
             echo "EMBEDDER_URL =http://embedder:8001" >> ./backend/.env
-            echo "RAG_URL =rhttp://ag:8002" >> ./backend/.env
+            echo "RAG_URL =http://ag:8002" >> ./backend/.env
             ########################################################################################
             touch ./embedder/.env
             echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}">>./embedder/.env
