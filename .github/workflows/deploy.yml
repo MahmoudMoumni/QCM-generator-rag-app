@@ -70,7 +70,7 @@ jobs:
             echo "NGROK_AUTH_TOKEN=${{ secrets.NGROK_AUTH_TOKEN }}" >> ./backend/.env
             echo "UPLOAD_DIR =/app/uploaded_documents" >> ./backend/.env
             echo "EMBEDDER_URL =http://embedder:8001" >> ./backend/.env
-            echo "RAG_URL =http://ag:8002" >> ./backend/.env
+            echo "RAG_URL =http://rag:8002" >> ./backend/.env
             ########################################################################################
             touch ./embedder/.env
             echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}">>./embedder/.env
