@@ -72,9 +72,13 @@ jobs:
             echo "RAG_URL =rhttp://ag:8002" >> ./backend/.env
             ########################################################################################
             touch ./embedder/.env
+            echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}">>./embedder/.env
+            echo "NVIDIA_API_KEY=${{ secrets.NVIDIA_API_KEY }}">>./embedder/.env
             echo "FAISS_INDEX_PATH =/app/faiss_db" >> ./embedder/.env
             ########################################################################################
             touch ./rag/.env
+            echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}">>./rag/.env
+            echo "NVIDIA_API_KEY=${{ secrets.NVIDIA_API_KEY }}">>./rag/.env
             echo "FAISS_INDEX_PATH =/app/faiss_db" >> ./rag/.env
             ########################################################################################
             touch ./web-app/.env
