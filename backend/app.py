@@ -255,9 +255,13 @@ async def generate_answer(user_input: str):
 
 # Your route for streaming response
 async def streaming_route(request):
+    print("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
     body = await request.json()
+    print(body)
     user_input = body.get('user_input')
+    print(user_input)
     token_stream =  generate_answer(user_input)
+    print(token_stream)
     return StreamingResponse(token_stream, media_type="text/plain")
 # Register the streaming route using add_routes()
 app.add_route("/rag_stream", streaming_route, methods=["POST"])
