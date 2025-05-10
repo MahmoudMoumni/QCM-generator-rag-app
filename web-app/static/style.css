@@ -1,0 +1,73 @@
+/* Overlay and modal */
+.congrats-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.congrats-modal {
+    position: relative;
+    text-align: center;
+    color: white;
+    background: #333;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+    z-index: 2;
+}
+
+.congrats-modal button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    border: none;
+    background: #fff;
+    color: #333;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* Confetti Canvas */
+#confetti-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+@keyframes float {
+    0%   { transform: translatey(0px); }
+    50%  { transform: translatey(-10px); }
+    100% { transform: translatey(0px); }
+}
+
+
+/* Red border and shaking animation */
+.shake-error {
+    border-bottom: 2px solid red;
+    animation: shake 0.4s;
+  }
+    
+
+  .question-block.error h5 {
+      border-bottom: 2px solid red;
+      animation: shake 0.4s;
+  }
+  
+  @keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+  }

@@ -4,13 +4,7 @@
     <meta charset="UTF-8">
     <title>Upload PDF - QCM Generator</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        @keyframes float {
-            0%   { transform: translatey(0px); }
-            50%  { transform: translatey(-10px); }
-            100% { transform: translatey(0px); }
-        }
-        </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body class="bg-light">
@@ -22,7 +16,7 @@
         </div>
         <div class="card-body">
             <div class="mb-4">
-                <label for="new_pdf" class="form-label">📤 Upload a new PDF</label>
+                <label for="new_pdf" class="form-label">📤 select document then click on upload</label>
                 <div class="input-group">
                     <input type="file" class="form-control" id="new_pdf" accept=".pdf">
                     <button class="btn btn-outline-secondary" type="button" id="uploadBtn" disabled>Upload</button>
@@ -32,7 +26,7 @@
             <form  id="upload-form" method="POST" action="{{url_for('index') }}" enctype="multipart/form-data">
                 <div class="mb-4">
                 <div class="mb-3">
-                    <label for="file_name" class="form-label">📂 Select a document to ask about</label>
+                    <label for="file_name" class="form-label" id ="doc-select-label">📂 Select a document to ask about</label>
                     <select class="form-select" name="file_name" id="file_name" >
                         <option value="" disabled selected>-- Choose a file --</option>
                         {% for doc in  session["documents"] %}
@@ -93,6 +87,17 @@
         
             form.addEventListener("submit", async function (e) {
                 e.preventDefault();
+                //check if form is valid first .ie a file is selected
+                const documentSelect = document.getElementById('file_name');
+                const documentSelectLabel=document.getElementById('doc-select-label')
+                if (!documentSelect.value) {
+                    // Remove and re-add animation class to force replay
+                    documentSelectLabel.classList.remove('shake-error');
+                    void documentSelectLabel.offsetWidth;
+                    documentSelectLabel.classList.add('shake-error');
+                    return ;
+                }
+
                 loadingModal.show();
         
                 const formData = new FormData(form);
@@ -223,6 +228,6 @@
         });
     });
     </script>
-    
+
 </body>
 </html>

@@ -51,31 +51,36 @@ jobs:
             sudo cp -r ../certbot ./certbot
 
             #if its the first time we need to generate ssl certification
-
-            touch ./rag-app/.env
-
-            # Create ./rag-app/.env file from GitHub secrets
-            
-            echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}">>./rag-app/.env
-            echo "NVIDIA_API_KEY=${{ secrets.NVIDIA_API_KEY }}">>./rag-app/.env
-            echo "FAISS_INDEX_PATH=${{ secrets.FAISS_INDEX_PATH }}">> ./rag-app/.env
-            echo "S3_AWS_ACCESS_KEY_ID=${{ secrets.S3_AWS_ACCESS_KEY_ID }}" >> ./rag-app/.env
-            echo "S3_AWS_SECRET_ACCESS_KEY=${{ secrets.S3_AWS_SECRET_ACCESS_KEY }}" >> ./rag-app/.env
-            echo "BUCKET_NAME=${{ secrets.BUCKET_NAME }}" >> ./rag-app/.env
-            echo "REGION=${{ secrets.REGION }}" >> ./rag-app/.env
-            echo "DB_HOST=${{ secrets.DB_HOST }}" >> ./rag-app/.env
-            echo "DB_PORT=${{ secrets.DB_PORT }}" >> ./rag-app/.env
-            echo "DB_NAME=${{ secrets.DB_NAME }}" >> ./rag-app/.env
-            echo "DB_USER=${{ secrets.DB_USER }}" >> ./rag-app/.env
-            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> ./rag-app/.env
-            echo "NGROK_AUTH_TOKEN=${{ secrets.NGROK_AUTH_TOKEN }}" >> ./rag-app/.env
-
+            ########################################################################################
+            touch ./backend/.env
+            # Create ./backend/.env file from GitHub secrets
+            echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}">>./backend/.env
+            echo "NVIDIA_API_KEY=${{ secrets.NVIDIA_API_KEY }}">>./backend/.env
+            echo "FAISS_INDEX_PATH=${{ secrets.FAISS_INDEX_PATH }}">> ./backend/.env
+            echo "S3_AWS_ACCESS_KEY_ID=${{ secrets.S3_AWS_ACCESS_KEY_ID }}" >> ./backend/.env
+            echo "S3_AWS_SECRET_ACCESS_KEY=${{ secrets.S3_AWS_SECRET_ACCESS_KEY }}" >> ./backend/.env
+            echo "BUCKET_NAME=${{ secrets.BUCKET_NAME }}" >> ./backend/.env
+            echo "REGION=${{ secrets.REGION }}" >> ./backend/.env
+            echo "DB_HOST=${{ secrets.DB_HOST }}" >> ./backend/.env
+            echo "DB_PORT=${{ secrets.DB_PORT }}" >> ./backend/.env
+            echo "DB_NAME=${{ secrets.DB_NAME }}" >> ./backend/.env
+            echo "DB_USER=${{ secrets.DB_USER }}" >> ./backend/.env
+            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> ./backend/.env
+            echo "NGROK_AUTH_TOKEN=${{ secrets.NGROK_AUTH_TOKEN }}" >> ./backend/.env
+            echo "UPLOAD_DIR =/app/uploaded_documents" >> ./backend/.env
+            echo "EMBEDDER_URL =http://embedder:8001" >> ./backend/.env
+            echo "RAG_URL =rhttp://ag:8002" >> ./backend/.env
+            ########################################################################################
+            touch ./embedder/.env
+            echo "FAISS_INDEX_PATH =/app/faiss_db" >> ./embedder/.env
+            ########################################################################################
+            touch ./rag/.env
+            echo "FAISS_INDEX_PATH =/app/faiss_db" >> ./rag/.env
+            ########################################################################################
             touch ./web-app/.env
-
             # Create ./web-app/.env file from GitHub secrets
-            
-            echo "RAG_APP_URL=${{ secrets.RAG_APP_URL }}" >>./web-app/.env
-
+            echo "BACKEND_URL=${{ secrets.BACKEND_URL }}" >>./web-app/.env
+            ########################################################################################
             #this env for the phpmyadmin secrets
             touch .env
             echo "PMA_HOST=${{ secrets.DB_HOST }}" >> .env
@@ -85,7 +90,7 @@ jobs:
             echo "APACHE_AUTH_USER=${{ secrets.APACHE_AUTH_USER }}" >> .env
             echo "APACHE_AUTH_PASSWORD=${{ secrets.APACHE_AUTH_PASSWORD }}" >> .env
             echo "PMA_ABSOLUTE_URI=${{ secrets.PMA_ABSOLUTE_URI }}" >> .env            
-
+            ########################################################################################
             # Stop and remove existing containers
             sudo docker-compose down || true
 

@@ -1,8 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for, session,jsonify
+from flask import Flask, render_template, request, redirect, url_for, session,jsonify , Response
 import uvicorn 
 from asgiref.wsgi import WsgiToAsgi
 import os
-
+from dotenv import load_dotenv
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'  # Replace with secure key in production
@@ -16,31 +16,23 @@ if env_mode == "development":
     load_dotenv("./.env.development")
 
 
-RAG_APP_URL = os.getenv("RAG_APP_URL")
+BACKEND_URL = os.getenv("BACKEND_URL")
 
-
-# --- Mock: Generate fake questions 
-def generate_questions_from_pdf(file_path, num_questions):
-    return [
-        {
-            "id": i,
-            "question": f"Sample Question {i + 1} from {os.path.basename(file_path)}",
-            "options": ["Option A", "Option B", "Option C", "Option D"],
-            "answer": "Option A"
-        }
-        for i in range(num_questions)
-    ]
 
 
 # --- Routes ---
 import json
 import requests
 
+@app.route("/")
+def home():
+    session.clear()
+    return render_template("home.html")
+
 @app.route("/index", methods=["GET", "POST"])
 def index():
     session.clear()
-    response = requests.get(f"{RAG_APP_URL}/documents")
-
+    response = requests.get(f"{BACKEND_URL}/documents")
     if response.status_code == 200:
         print(response.text)
         json_response= json.loads(response.text)
@@ -49,13 +41,34 @@ def index():
     else:
         session["documents"]=[]
     return render_template("index.html")
+   
+
+@app.route("/chatbot")
+def chatbot():
+    session.clear()
+    return render_template("chatbot.html")
 
 
+@app.route("/chat", methods=["POST"])
+def chat():
+    user_input = request.json.get("user_input")
+
+    def generate():
+        response = requests.post(
+            f"{BACKEND_URL}/rag_stream",
+            json={"user_input": user_input},
+            stream=True
+        )
+        for chunk in response.iter_content(chunk_size=1):
+            if chunk:
+                yield chunk
+
+    return Response(generate(), content_type='text/plain')
 
 @app.route("/generate_quizz", methods=["POST"])
 def generate_quizz():
     session.clear()
-    
+    session["show_congrats"]=False
     num_questions =int(request.form["num_questions"])
     question_type = request.form.get("question_type")
     keywords_json = request.form.get("keywords")
@@ -77,7 +90,7 @@ def generate_quizz():
         "metadata": json.dumps(metadata)  # Send it as a single field
     }
      
-    response = requests.post(f"{RAG_APP_URL}/generate_quizz", data=data)
+    response = requests.post(f"{BACKEND_URL}/generate_quizz", data=data)
 
     if response.status_code == 200:
         print(response.text)
@@ -100,7 +113,7 @@ def run_function():
         files = {
             "file": (file.filename, file.stream, file.mimetype)
         }
-        response = requests.post(f"{RAG_APP_URL}/upload_file", files=files)
+        response = requests.post(f"{BACKEND_URL}/upload_file", files=files)
         if response.status_code == 200:
             print(response.text)
             documents=json.loads(response.text)
@@ -122,7 +135,6 @@ def quiz():
     done=session.get('done',False)
     print(session)
     if request.method == "POST":
- 
         # Process answers
         for quizz in quizzes:
             quizz_id =int(quizz["id"])
@@ -148,12 +160,11 @@ def quiz():
         session["answers"] = answers
         session["score"] = score
         session["feedback"] = feedback
-        session["done"] = True
-        
-        # Redirect to results page
-        print("nowwwww")
-        print(session)
+        session["done"] = True  
+        if session["score"]==len(quizzes):
+            session["show_congrats"]=True
         return redirect(url_for('quiz'))
+
     
     return render_template("quiz.html", quizzes=quizzes)#rest of variables will be used through session
 
@@ -168,4 +179,4 @@ def results():
 asgi_app = WsgiToAsgi(app)
 
 if __name__ == "__main__":
-    uvicorn.run(asgi_app, host="0.0.0.0", port=5000)
+    uvicorn.run(asgi_app,host="0.0.0.0", port=5000)

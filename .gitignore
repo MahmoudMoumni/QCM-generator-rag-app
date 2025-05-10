@@ -1,4 +1,6 @@
-rag-app/.env*
+backend/.env*
+embedder/.env*
+rag/.env*
 web-app/.env*
-rag-app/uploaded_files/*
-rag-app/faiss_db/*
+faiss_db
+uploaded_documents

@@ -1,18 +1,49 @@
 version: "3.9"
 
 services:
-  rag-app:
+
+  backend:
     build:
-      context: ./rag-app
-    container_name: rag-app-container
+      context: ./backend
+    container_name: backend-container
     ports:
       - "8000:8000"
     volumes:
-      - ./faiss_db:/app/faiss_db   
+      - ../faiss_db:/app/faiss_db   
+      - ../uploaded_documents:/app/uploaded_documents         
     environment:
       - ENVIRONMENT_MODE=production
     env_file:
-      - ./rag-app/.env
+      - ./backend/.env
+    restart: always
+
+  embedder:
+    build:
+      context: ./embedder
+    container_name: embedder-container
+    ports:
+      - "8001:8001"
+    volumes:
+      - ../faiss_db:/app/faiss_db 
+      - ../uploaded_documents:/app/uploaded_documents    
+    environment:
+      - ENVIRONMENT_MODE=production
+    env_file:
+      - ./embedder/.env
+    restart: always
+
+  rag:
+    build:
+      context: ./rag
+    container_name: rag-container
+    ports:
+      - "8002:8002"
+    volumes:
+      - ../faiss_db:/app/faiss_db   
+    environment:
+      - ENVIRONMENT_MODE=production
+    env_file:
+      - ./rag/.env
 
     restart: always
 
@@ -27,7 +58,7 @@ services:
     env_file:
       - ./web-app/.env
     depends_on:
-      - rag-app
+      - backend
     restart: always
 
   phpmyadmin:
@@ -58,4 +89,4 @@ services:
       - ./certbot/conf:/etc/letsencrypt
     depends_on:
       - web-app
-      - rag-app
+      - backend
