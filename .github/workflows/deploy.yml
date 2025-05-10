@@ -30,9 +30,6 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
             # Stop and remove existing containers ,ze do this in the beginning to avoid ram memory issues
-            sudo docker-compose down || true 
-
-
             sudo apt-get update
             sudo apt install -y docker
             sudo apt  install -y docker-compose 
