@@ -237,7 +237,7 @@ async def generate_answer(user_input: str):
     input_data['input']=user_input
     response=[]
     try:
-        #print(input_data)
+        print(input_data)
         response = requests.post(RAG_URL+"/generate_answer", json=input_data)
         if response.status_code == 200:
             print("succes get answer")
