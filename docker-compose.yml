@@ -9,8 +9,8 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ../faiss_db:/app/faiss_db   
-      - ../uploaded_documents:/app/uploaded_documents         
+      - ./faiss_db:/app/faiss_db   
+      - ./uploaded_documents:/app/uploaded_documents         
     environment:
       - ENVIRONMENT_MODE=production
     env_file:
@@ -24,8 +24,8 @@ services:
     ports:
       - "8001:8001"
     volumes:
-      - ../faiss_db:/app/faiss_db 
-      - ../uploaded_documents:/app/uploaded_documents    
+      - ./faiss_db:/app/faiss_db 
+      - ./uploaded_documents:/app/uploaded_documents    
     environment:
       - ENVIRONMENT_MODE=production
     env_file:
@@ -39,7 +39,7 @@ services:
     ports:
       - "8002:8002"
     volumes:
-      - ../faiss_db:/app/faiss_db   
+      - ./faiss_db:/app/faiss_db   
     environment:
       - ENVIRONMENT_MODE=production
     env_file:
@@ -90,3 +90,5 @@ services:
     depends_on:
       - web-app
       - backend
+      - rag
+      - embedder
