@@ -144,6 +144,7 @@ class QACustomRetriever(BaseRetriever):
 
 
 
+
 class RatingScore(BaseModel):
     relevance_score: float = Field(..., description="The relevance score of a document to a query.")
 ###############################################################################################################################
@@ -203,8 +204,12 @@ def docs2str(docs, title="Document"):
     """Useful utility for making chunks into context string. Optional, but useful"""
     out_str = ""
     for doc in docs:
-        doc_name = getattr(doc, 'metadata', {}).get('Title', title)
-        if doc_name: out_str += f"[Quote from {doc_name}] "
+        doc_id = getattr(doc, 'metadata', {}).get('document_id',"unknown doc")
+        doc_page = getattr(doc, 'metadata', {}).get('page')
+        #print(f"doc ID {doc_id}")
+        #print(f"doc page {doc_page}")
+        if doc_id: out_str += f"[Quote from Document with ID {doc_id}] "
+        if doc_page: out_str += f"[Data found in page {doc_page}] "
         out_str += getattr(doc, 'page_content', str(doc)) + "\n"
     return out_str
 
@@ -375,10 +380,12 @@ def create_qa_rag_chain():
     ])
 
     contextualize_system_prompt = (
-    """Given a chat history and the latest user question \
-    which might reference context in the chat history, formulate a standalone question which can be understood \
+    """Given a chat history and the latest user input \
+    which might reference context in the chat history, formulate a standalone  question which can be understood \
     without the chat history. Do NOT answer the question, just reformulate it and include the related data from chat history that \
-    might be related to the user's last question  otherwise return it as is."""
+    might be related to the user's last question  otherwise return it as is. Make sure that the formulated question is adressed to the system \
+    not to the user,in other words dont complicate question ,your object is to formulate the question and give it context so we can retrieve \
+    more related chunks of data from stored documents """
     )
 
     contextualize_prompt = ChatPromptTemplate.from_messages([
@@ -395,7 +402,8 @@ def create_qa_rag_chain():
 
 
     # Create the custom retriever
-    context_getter = itemgetter('input') | qa_custom_retriever | long_reorder |  docs2str
+    #context_getter = itemgetter('input') | qa_custom_retriever | long_reorder |  docs2str
+    context_getter = itemgetter('input') | qa_custom_retriever  |  docs2str
     #retrieval_chain = form_input_dict_node | RunnableAssign({'input': lambda x: enhance_query_with_memory(x["input"])}) | RunnableAssign({'context' : context_getter}) 
     retrieval_chain = form_input_dict_node | RunnableAssign({'context' : context_getter}) 
     
@@ -416,7 +424,7 @@ def create_qa_rag_chain():
         | RunnableLambda(lambda x: x.content)
     )
     generator_chain = {"output" : generator_chain } | RunnableLambda(output_puller)  ## GIVEN
-    qa_rag_chain = contextualize_chain | retrieval_chain | generator_chain 
+    qa_rag_chain = contextualize_chain | RDebug | RPrint | retrieval_chain | generator_chain 
 
     return qa_rag_chain
 
