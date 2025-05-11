@@ -73,9 +73,10 @@ if env_mode == "development":
 #load all variables
 FAISS_INDEX_PATH = os.getenv("FAISS_INDEX_PATH")
 #####################################################################################################################################################
-global  custom_retriever
+global  quizz_custom_retriever
+global  qa_custom_retriever
 # Create a custom retriever class
-class CustomRetriever(BaseRetriever):
+class QuizzCustomRetriever(BaseRetriever):
 
     vectorstore: Any
     rerank_llm: Any
@@ -88,7 +89,7 @@ class CustomRetriever(BaseRetriever):
         self.filter_metadata=filter_metadata
 
 
-    def _get_relevant_documents(self, query: str, num_docs=5) -> List[Document]:
+    def _get_relevant_documents(self, query: str, num_docs=10) -> List[Document]:
         #we have to pass filter_metadata through query and then extract  it as well as the original query
         #filter_metadata
         if query=="":
@@ -128,6 +129,18 @@ class CustomRetriever(BaseRetriever):
                 return   filtered_docs
             return rerank_documents(rerank_llm,query, filtered_docs, top_n=num_docs)
 
+
+class QACustomRetriever(BaseRetriever):
+
+    vectorstore: Any
+    rerank_llm: Any
+
+    class Config:
+        arbitrary_types_allowed = True
+
+    def _get_relevant_documents(self, query: str, num_docs=10) -> List[Document]:
+        initial_docs = self.vectorstore.similarity_search(query, k=30)
+        return rerank_documents(rerank_llm,query, initial_docs, top_n=num_docs)
 
 
 
@@ -260,7 +273,8 @@ parser = PydanticOutputParser(pydantic_object=QuizOutput)
 format_instructions = parser.get_format_instructions()
 
 
-custom_retriever = CustomRetriever(vectorstore=docstore,rerank_llm=rerank_llm)
+quizz_custom_retriever = QuizzCustomRetriever(vectorstore=docstore,rerank_llm=rerank_llm)
+qa_custom_retriever = QACustomRetriever(vectorstore=docstore,rerank_llm=rerank_llm)
 
 # Modify your generator chain to store conversation history in memory
 def generator_with_memory(inputs):#this function receives list of messages because its after the prompt
@@ -316,7 +330,7 @@ def create_quizz_rag_chain():
 
 
     # Create the custom retriever
-    context_getter = itemgetter('input') | custom_retriever | long_reorder |  docs2str
+    context_getter = itemgetter('input') | quizz_custom_retriever | long_reorder |  docs2str
     retrieval_chain = form_input_dict_node | RunnableAssign({'context' : context_getter}) 
     
 
@@ -381,7 +395,7 @@ def create_qa_rag_chain():
 
 
     # Create the custom retriever
-    context_getter = itemgetter('input') | custom_retriever | long_reorder |  docs2str
+    context_getter = itemgetter('input') | qa_custom_retriever | long_reorder |  docs2str
     #retrieval_chain = form_input_dict_node | RunnableAssign({'input': lambda x: enhance_query_with_memory(x["input"])}) | RunnableAssign({'context' : context_getter}) 
     retrieval_chain = form_input_dict_node | RunnableAssign({'context' : context_getter}) 
     
@@ -406,7 +420,7 @@ def create_qa_rag_chain():
 
     return qa_rag_chain
 
-def  update_retriever_filter_metadata(filter_metadata):
+def  update_retriever_filter_metadata(custom_retriever,filter_metadata):
     custom_retriever.update_filter_metadata(filter_metadata)
 
 ##################################################################################################################################################################
@@ -469,7 +483,7 @@ async def generate_quizz(
     try:
         print(input_data)
         input_data["task"]="generate_quiz"
-        update_retriever_filter_metadata({'document_id':int(input_data["selected_doc_id"])})
+        update_retriever_filter_metadata(quizz_custom_retriever,{'document_id':int(input_data["selected_doc_id"])})
         # Parse the JSON object
         quizzes=await generate_quizzes(input_data)
         return JSONResponse(
