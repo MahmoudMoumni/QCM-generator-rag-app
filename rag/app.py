@@ -306,7 +306,7 @@ def create_quizz_rag_chain():
     # Define the chat prompt using System and Human messages
     quizz_chat_prompt = ChatPromptTemplate.from_messages([
         ("system",         """
-            You are an assistant that returns ONLY valid JSON arrays of objects. Do not include any explanation, markdown, or additional \
+            You are an assistant that returns ONLY valid JSON object . Do not include any explanation, markdown, or additional \
             text before or after the JSON. The JSON must be valid and parsable.
 
             Generate {num_questions} multiple-choice questions from the following content. 
@@ -318,7 +318,7 @@ def create_quizz_rag_chain():
             - Do **not** add any extra text or explanation before or after the JSON.
             - Do not cut off or leave any question object incomplete.
             - Do **not** wrap the entire output in quotes or markdown.
-            - You must return a valid JSON array only. Anything else will cause an error.
+            - You must return a valid JSON object only with one attribute "quizzes". Anything else will cause an error.
 
             Content:
             {context}
