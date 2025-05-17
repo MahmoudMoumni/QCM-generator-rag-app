@@ -88,6 +88,9 @@ class QuizzCustomRetriever(BaseRetriever):
     def update_filter_metadata(self,filter_metadata: Dict[str, Any]):
         self.filter_metadata=filter_metadata
 
+    def reload_docstore(self,docstore:Any):
+        self.vectorstore=docstore
+
 
     def _get_relevant_documents(self, query: str, num_docs=10) -> List[Document]:
         #we have to pass filter_metadata through query and then extract  it as well as the original query
@@ -142,6 +145,10 @@ class QACustomRetriever(BaseRetriever):
     class Config:
         arbitrary_types_allowed = True
 
+    def reload_docstore(self,docstore:Any):
+        self.vectorstore=docstore
+
+
     def _get_relevant_documents(self, query: str, num_docs=10) -> List[Document]:
         initial_docs = self.vectorstore.similarity_search(query, k=30)
         return rerank_documents(rerank_llm,query, initial_docs, top_n=num_docs)
@@ -154,6 +161,10 @@ class SearchCustomRetriever(BaseRetriever):
 
     class Config:
         arbitrary_types_allowed = True
+
+    def reload_docstore(self,docstore:Any):
+        self.vectorstore=docstore
+
 
     def _get_relevant_documents(self, query: str, num_docs=7) -> List[Document]:
         initial_docs = self.vectorstore.similarity_search(query, k=15)
@@ -195,6 +206,7 @@ def load_or_create_docstore(faiss_index_path):
     if os.path.exists(f"{faiss_index_path}/index.faiss") and os.path.exists(f"{faiss_index_path}/index.pkl"):
         return FAISS.load_local(faiss_index_path, embeddings=embedder,allow_dangerous_deserialization=True)
     return default_FAISS()
+
 
 def aggregate_vstores(vectorstores):
     ## Initialize an empty FAISS Index and merge others into it
@@ -533,6 +545,30 @@ async def get_answer(
                 "answer": ""
             }
         )
+
+@app.get("/reload_docstore")
+async def reload_docstore():
+    try:
+        print("hello")
+        docstore=load_or_create_docstore(FAISS_INDEX_PATH)
+        quizz_custom_retriever.reload_docstore(docstore)
+        qa_custom_retriever.reload_docstore(docstore)
+        search_custom_retriever.reload_docstore(docstore)
+        return JSONResponse(
+            status_code=200,
+            content={
+                "status": "success"
+            }
+        )
+    except Exception as e:
+        print(e)
+        return JSONResponse(
+            status_code=500,
+            content={
+                "status": "error"
+            }
+        )
+
 
 
 async def generate_quizzes(input_data):

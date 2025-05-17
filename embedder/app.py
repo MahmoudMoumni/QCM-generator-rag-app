@@ -67,7 +67,7 @@ import time
 from fastapi.responses import JSONResponse
 import boto3
 
-
+from langchain.vectorstores import Chroma
 
 ########################################################################################################################################################
 env_mode = os.getenv("ENVIRONMENT_MODE", "development")

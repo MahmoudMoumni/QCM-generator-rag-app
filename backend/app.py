@@ -153,20 +153,26 @@ async def file_saver(file: UploadFile):
 
         print("Response:", response.json())
         if response.status_code == 200:
-            return doc_id,doc_name,s3_doc_path
+            #if we embedd new document we need to inform rag to reload the vectordb
+            docstore_reload_response=requests.get(RAG_URL+"/reload_docstore")
+            if response.status_code == 200:
+                return doc_id,doc_name,s3_doc_path,True
+            else:
+                return doc_id,doc_name,s3_doc_path,False
+
         else:
             print(f"Error uploading file")
-            return None,None,None
+            return None,None,None,None
     except Exception as e:
         print(f"Error uploading file: {e}")
-        return None,None,None
+        return None,None,None,None
 
 
 
 @app.post("/upload_file")
 async def upload_file(file: UploadFile = File(...)):
     try:
-      doc_id,doc_name,doc_path = await file_saver(file)  # Save file
+      doc_id,doc_name,doc_path,docstore_reload_result = await file_saver(file)  # Save file
       #fetch all documents and return them in a response
       cursor.execute("SELECT * FROM documents")
       all_docs = cursor.fetchall()
