@@ -94,6 +94,8 @@ class QuizzCustomRetriever(BaseRetriever):
         #filter_metadata
         if query=="":
             initial_docs =list(self.vectorstore.docstore._dict.values())
+            print("initiaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaal")
+            print(initial_docs)
             filtered_docs=[]
             # Filter by metadata if provided
             if self.filter_metadata:
@@ -103,6 +105,8 @@ class QuizzCustomRetriever(BaseRetriever):
                     if all(doc.metadata.get(k) == v for k, v in self.filter_metadata.items())
                 ]  
                 self.filter_metadata=None   
+            print("heloooooooooooooooooooooooooooooooo")
+            print(filtered_docs)
             return filtered_docs
 
         else:
@@ -386,7 +390,7 @@ def create_quizz_rag_chain():
 
     # Create the custom retriever
     context_getter = itemgetter('input') | quizz_custom_retriever | long_reorder |  docs2str
-    retrieval_chain = form_input_dict_node | RunnableAssign({'context' : context_getter})
+    retrieval_chain = form_input_dict_node | RunnableAssign({'context' : context_getter})|RDebug|RPrint
     
 
     quizz_config_node=RunnableMap({
