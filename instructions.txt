@@ -1,1 +1,26 @@
 ssh -i rag-app-key.pem ubuntu@16.16.186.214
+
+
+to generate ssl certification
+run nginx container with this config
+server {
+    listen 80;
+    server_name moumni-genai.click;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+
+
+then run this command :
+sudo docker run -it --rm -v "$(pwd)/certbot/conf:/etc/letsencrypt"  -v "$(pwd)/certbot/www:/var/www/certbot"        certbot/certbot certonly --webroot -w /var/www/certbot        --email mahmoudmoumni049458@gmail.com      --agree-tos    --no-eff-email    -d moumni-genai.click
+
+then update nginx default.conf file and restart it
+
+

@@ -386,7 +386,7 @@ def create_quizz_rag_chain():
 
     # Create the custom retriever
     context_getter = itemgetter('input') | quizz_custom_retriever | long_reorder |  docs2str
-    retrieval_chain = form_input_dict_node | RunnableAssign({'context' : context_getter}) 
+    retrieval_chain = form_input_dict_node | RunnableAssign({'context' : context_getter})
     
 
     quizz_config_node=RunnableMap({
