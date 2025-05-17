@@ -209,6 +209,7 @@ async def get_documents():
       results = [dict(zip(columns, row)) for row in all_docs]
       # Convert to JSON string (optional)
       all_docs_json = json.dumps(results, indent=2)
+      #print(all_docs_json)
       return JSONResponse(
           status_code=200,
           content={
@@ -263,10 +264,62 @@ async def streaming_route(request):
     token_stream =  generate_answer(user_input)
     print(token_stream)
     return StreamingResponse(token_stream, media_type="text/plain")
+
 # Register the streaming route using add_routes()
 app.add_route("/rag_stream", streaming_route, methods=["POST"])
 
 
+async def search(user_input):
+    input_data={}
+    input_data['input']=user_input
+    try:
+        print(input_data)
+        response = requests.post(RAG_URL+"/search", json=input_data)
+        if response.status_code == 200:
+            print("succes get answer")
+            response=response.json()
+            print(response)
+            results=response['search_results']
+            print(results)
+            return results
+        else:
+            print("failure get answer")
+            return []
+    except Exception as e:
+        print(str(e))
+        return []
+        
+
+# Your route for streaming response
+async def search_route(request):
+    try:
+        print("search_route")
+        body = await request.json()
+        print(body)
+        user_input = body.get('user_input')
+        print(user_input)
+        results =  await search(user_input)
+
+        print(results)
+        return JSONResponse(
+            status_code=200,
+            content={
+                "status": "success",
+                "search_results": results
+            }
+        )
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={
+                "status": "error",
+                "search_results": []
+            }
+        )
+    
+
+# Register the streaming route using add_routes()
+app.add_route("/search", search_route, methods=["POST"])
 
 async def generate_quizzes(input_data):
     try:
@@ -320,6 +373,49 @@ async def generate_quizz(
             }
         )
 
+
+@app.post("/get-doc-url")
+async def get_doc_url(
+    doc_data:  Dict[str, Any] 
+):
+    try:
+        # Parse the JSON object
+        doc_id=int(doc_data["doc_id"])
+        print("doc_id")
+        print(doc_id)
+        cursor.execute("SELECT * FROM documents WHERE id = %s", (doc_id,))
+        doc = cursor.fetchone()
+        doc_url=""
+        if doc:
+            # Get column names from cursor description
+            columns = [desc[0] for desc in cursor.description]
+            # Convert row to dict
+            doc_dict = dict(zip(columns, doc))
+            file_path= doc_dict["path"].replace(f"s3://{BUCKET_NAME}/", "")
+            doc_url = s3_client.generate_presigned_url(
+                    "get_object",
+                    Params={"Bucket": BUCKET_NAME, "Key":file_path},  # Full path
+                    ExpiresIn=6000  # URL valid for 10 minutes
+            )
+        else:
+            print("Document not found")
+ 
+        return JSONResponse(
+            status_code=200,
+            content={
+                "status": "success",
+                "doc_url":doc_url
+            }
+        )
+    except Exception as e:
+        print(str(e))
+        return JSONResponse(
+            status_code=500,
+            content={
+                "status": "error",
+                "doc_url": ""
+            }
+        )
 
 
 if __name__ == "__main__":

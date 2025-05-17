@@ -54,20 +54,6 @@ document.getElementById("chat-form").addEventListener("submit", async (e) => {
     hideTypingIndicator();
 });
 
-document.getElementById("upload-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const status = document.getElementById("upload-status");
-    const formData = new FormData(e.target);
-
-    const response = await fetch("/upload", {
-        method: "POST",
-        body: formData
-    });
-
-    const text = await response.text();
-    status.textContent = text;
-});
-
 
 document.addEventListener("DOMContentLoaded", function () {
     const fileInput = document.getElementById("new_pdf");

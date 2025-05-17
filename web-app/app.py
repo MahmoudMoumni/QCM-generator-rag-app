@@ -9,7 +9,8 @@ app.secret_key = 'supersecretkey'  # Replace with secure key in production
 from flask_cors import CORS
 CORS(app)
 
-
+import tempfile
+import uuid
 
 env_mode = os.getenv("ENVIRONMENT_MODE", "development")
 if env_mode == "development":
@@ -18,6 +19,8 @@ if env_mode == "development":
 
 BACKEND_URL = os.getenv("BACKEND_URL")
 
+# Directory for temporary search result files
+TEMP_DIR = tempfile.gettempdir()
 
 
 # --- Routes ---
@@ -47,6 +50,53 @@ def index():
 def chatbot():
     session.clear()
     return render_template("chatbot.html")
+
+@app.route("/contextLens")
+def contextLens():
+    # Load results from the temporary file
+    response = requests.get(f"{BACKEND_URL}/documents")
+    if response.status_code == 200:
+        #print(response.text)
+        json_response= json.loads(response.text)
+        session["documents"] =json_response["documents"]
+        print(session["documents"])
+        #print(session["documents"])
+    else:
+        session["documents"]=[]
+    return render_template("contextLens.html")
+
+@app.route("/search", methods=["POST"])
+def search():
+    search_results=[]
+    user_input = request.json.get("user_input")
+    response = requests.post(
+        f"{BACKEND_URL}/search",
+        json={"user_input": user_input},
+        
+    )
+    if response.status_code == 200:
+        json_response= json.loads(response.text)
+        search_results =json_response["search_results"]
+    else:
+        search_results=[]
+    return  jsonify({"search_results": search_results})
+
+
+   
+@app.route("/get-doc-url", methods=["POST"])
+def get_doc_url():
+    doc_url=""
+    doc_id = request.json.get("doc_id")
+    response = requests.post(
+        f"{BACKEND_URL}/get-doc-url",
+        json={"doc_id": doc_id},
+        
+    )
+    if response.status_code == 200:
+        json_response= json.loads(response.text)
+        doc_url =json_response["doc_url"]
+    
+    return  jsonify({"doc_url": doc_url}) 
 
 
 @app.route("/chat", methods=["POST"])

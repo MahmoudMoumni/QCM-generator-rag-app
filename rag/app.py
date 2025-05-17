@@ -143,7 +143,17 @@ class QACustomRetriever(BaseRetriever):
         return rerank_documents(rerank_llm,query, initial_docs, top_n=num_docs)
 
 
+class SearchCustomRetriever(BaseRetriever):
 
+    vectorstore: Any
+    rerank_llm: Any
+
+    class Config:
+        arbitrary_types_allowed = True
+
+    def _get_relevant_documents(self, query: str, num_docs=7) -> List[Document]:
+        initial_docs = self.vectorstore.similarity_search(query, k=15)
+        return rerank_documents_for_search(rerank_llm,query, initial_docs, top_n=num_docs)
 
 class RatingScore(BaseModel):
     relevance_score: float = Field(..., description="The relevance score of a document to a query.")
@@ -213,6 +223,20 @@ def docs2str(docs, title="Document"):
         out_str += getattr(doc, 'page_content', str(doc)) + "\n"
     return out_str
 
+def docs2search_results(docs):
+    search_results=[]
+    for doc in docs:
+        search_result={}
+        doc_id = getattr(doc, 'metadata', {}).get('document_id',"unknown doc")
+        page = getattr(doc, 'metadata', {}).get('page')
+        content= getattr(doc, 'page_content', str(doc))
+        search_result["doc_id"]=doc_id
+        search_result["page"]=page
+        search_result["content"]=content
+        search_results.append(search_result)
+        
+    return search_results
+
 def output_puller(inputs):
     """"Output generator. Useful if your chain returns a dictionary with key 'output'"""
     if isinstance(inputs, dict):
@@ -263,6 +287,31 @@ def rerank_documents(rerank_llm,query: str, docs: List[Document], top_n: int = 6
     reranked_docs = sorted(scored_docs, key=lambda x: x[1], reverse=True)
     return [doc for doc, _ in reranked_docs[:top_n]]
 
+def rerank_documents_for_search(rerank_llm,query: str, docs: List[Document], top_n: int = 15) -> List[Document]:
+    prompt_template = PromptTemplate(
+        input_variables=["query", "doc"],
+        template="""On a scale of 1-10, rate the relevance of the following document to the query. Consider the specific context and intent of the query, not just keyword matches.
+        Query: {query}
+        Document: {doc}
+        Relevance Score:"""
+    )
+
+    llm=rerank_llm
+    llm_chain = prompt_template | llm.with_structured_output(RatingScore)
+
+    scored_docs = []
+    for doc in docs:
+        input_data = {"query": query, "doc": doc.page_content}
+        score = llm_chain.invoke(input_data).relevance_score
+        try:
+            score = float(score)
+        except ValueError:
+            score = 0  # Default score if parsing fails
+        if score > 0.6:
+            scored_docs.append((doc, score))
+
+    reranked_docs = sorted(scored_docs, key=lambda x: x[1], reverse=True)
+    return [doc for doc, _ in reranked_docs[:top_n]]
 
 # 1. Dynamic instruction generator
 def get_instruction(inputs):
@@ -280,6 +329,7 @@ format_instructions = parser.get_format_instructions()
 
 quizz_custom_retriever = QuizzCustomRetriever(vectorstore=docstore,rerank_llm=rerank_llm)
 qa_custom_retriever = QACustomRetriever(vectorstore=docstore,rerank_llm=rerank_llm)
+search_custom_retriever = SearchCustomRetriever(vectorstore=docstore,rerank_llm=rerank_llm)
 
 # Modify your generator chain to store conversation history in memory
 def generator_with_memory(inputs):#this function receives list of messages because its after the prompt
@@ -428,6 +478,14 @@ def create_qa_rag_chain():
 
     return qa_rag_chain
 
+def create_search_rag_chain():
+    RPrint =RunnableLambda(lambda x: print(x) or x)
+    RDebug=RunnableLambda(lambda x: print("Debug!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!") or x)
+    context_getter = itemgetter('input') | search_custom_retriever  |  docs2search_results
+    retrieval_chain = form_input_dict_node | RunnableAssign({'search_results' : context_getter})
+    search_rag_chain = retrieval_chain 
+    return search_rag_chain
+
 def  update_retriever_filter_metadata(custom_retriever,filter_metadata):
     custom_retriever.update_filter_metadata(filter_metadata)
 
@@ -440,6 +498,7 @@ app = FastAPI(
 
 qa_rag_chain= create_qa_rag_chain()
 quizz_rag_chain=create_quizz_rag_chain()
+search_rag_chain=create_search_rag_chain()
 
 async def generate_answer(input_data):
     response = qa_rag_chain.invoke(input_data)
@@ -512,7 +571,45 @@ async def generate_quizz(
         )
 
 
+async def search(input_data):
+    search_results=[]
+    try:
+        response = search_rag_chain.invoke(input_data)
+        print(response)
+        search_results=response["search_results"]
+    except Exception as e:
+        print(str(e))
+    return  search_results
 
+
+
+@app.post("/search")
+async def search_route(
+    input_data:  Dict[str, Any] 
+):
+    try:
+        print(input_data)
+        input_data["task"]="search"
+        #update_retriever_filter_metadata(search_custom_retriever,{'document_id':int(input_data["selected_doc_id"])})
+        search_results=await search(input_data)
+        print("search_results")
+        print(search_results)
+        return JSONResponse(
+            status_code=200,
+            content={
+                "status": "success",
+                "search_results": search_results
+            }
+        )
+    except Exception as e:
+        print(e)
+        return JSONResponse(
+            status_code=500,
+            content={
+                "status": "error",
+                "search_results": []
+            }
+        )
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8002)
 

@@ -77,20 +77,8 @@ h2 {
   outline: none;
 }
 
-.chat-form button {
-  background-color: #ff9800;
-  color: white;
-  border: none;
-  padding: 12px 18px;
-  border-radius: 10px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
 
-.chat-form button:hover {
-  background-color: #fb8c00;
-}
+
 
 .upload-form {
   margin-top: 20px;
@@ -169,29 +157,116 @@ h2 {
 }
 
 
-.main-container {
+.send-button {
+  background-color: #000; /* Black background */
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
   display: flex;
-  height: 100vh;
-}
-
-.chat-container {
-  width: 70%;
-  padding: 20px;
-  overflow-y: auto;
-  border-right: 1px solid #ccc;
-}
-
-.pdf-viewer-container {
-  width: 30%;
-  display: flex;
-  justify-content: center;
   align-items: center;
-  background-color: #f2f2f2;
-  padding: 20px;
-  overflow: auto;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  padding: 0;
+}
+/* Disabled button styles */
+button:disabled {
+  background-color: #868585; /* Lighter background */
+  color: #999; /* Lighter text */
+  cursor: not-allowed; /* Change cursor to indicate the button is not clickable */
+  opacity: 0.5; /* Slightly faded to show it's inactive */
 }
 
-#pdf-canvas {
-  border: 1px solid #ddd;
-  max-width: 100%;
+.send-button:hover {
+  background-color: #4b4747; /* Slightly lighter on hover */
+}
+
+.send-button svg {
+  width: 20px;
+  height: 20px;
+  fill: white; /* Ensures the arrow is white */
+}
+
+
+
+
+
+.Results {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+label {
+  display: block;
+  width: 100%;
+}
+
+.suggestion-btn {
+  display: block;
+  width: 100%;
+  background-color: #f0f0f0;
+  border: none;
+  padding: 15px 20px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-size: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.suggestion-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.expanded-text {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  padding: 0 20px;
+  font-size: 14px;
+  color: #333;
+}
+
+input[type="checkbox"]:checked ~ .expanded-text {
+  max-height: 150px;
+  padding-top: 10px;
+}
+
+.pdf-viewer-container { height: 100%;width: 95%; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+canvas {height: 95%; border: 1px solid #ddd; max-width: 98%; }
+.pdf-controls { display: flex; gap: 10px; margin-bottom: 10px; }
+
+
+.Results {
+  max-height: 400px; /* Set the maximum height for the results */
+  overflow-y: auto;  /* Enable vertical scrolling */
+  /*border: 1px solid #ddd;*/
+  padding: 10px;
+  margin-top: 20px;
+  background-color: #f9f9f9;
+}
+.suggestion-btn {
+  display: block;
+  background: #007BFF;
+  color: white;
+  border: none;
+  padding: 8px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  border-radius: 5px;
+}
+.expanded-text {
+  display: none;
+  padding: 5px;
+  background: #f0f0f0;
+  margin-top: 5px;
+  border-radius: 5px;
+}
+label input:checked + .suggestion-btn + .expanded-text {
+  display: block;
 }
